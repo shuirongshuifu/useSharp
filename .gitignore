@@ -1,0 +1,50 @@
+# Node modules
+/node_modules/
+
+# Debug log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependency directories
+jspm_packages/
+
+# TypeScript v1 declaration files
+typings/
+
+# Environment files
+.env
+.env.test
+
+# IDE or editor settings
+/.vscode/
+/.idea/
+/*.sublime-workspace
+/*.sublime-project
+
+# Build and distribution directories
+/dist/
+/build/
+/tmp/
+/out/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+
+# Test directories and coverage reports
+/coverage/
+/test-coverage/
+/*.tgz
+
+# Other files
+*.bak
+*.swp
+*.swo
+
+# Package lock files (Optional)
+package-lock.json
+yarn.lock

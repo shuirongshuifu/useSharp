@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片压缩工具</title>
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background: #000;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        /* 主容器 */
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* 标题样式 */
+        .title {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #6366f1 0%, #14b8a6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+        }
+
+        .subtitle {
+            font-size: 24px;
+            color: #86868b;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        /* 输入区域 */
+        .input-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 30px;
+        }
+
+        .input-section .button-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 16px;
+            margin-bottom: 6px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        input[type="file"]:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.5);
+        }
+
+        /* 选择器样式 */
+        select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 40px;
+            margin-bottom: 20px;
+        }
+
+        select:focus {
+            outline: none;
+            background-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.5);
+        }
+
+        /* 修改下拉选项的样式 */
+        select option {
+            background-color: #1a1a1a;
+            color: #fff;
+            padding: 12px;
+        }
+
+        /* 为Firefox特别设置 */
+        @-moz-document url-prefix() {
+            select {
+                color: #fff;
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+
+            select option {
+                background-color: #1a1a1a;
+            }
+        }
+
+        /* 为Webkit浏览器（Chrome、Safari等）特别设置 */
+        select::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        select::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        select::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+
+        select::-webkit-scrollbar-thumb:hover {
+            background: #444;
+        }
+
+        /* 按钮样式 */
+        button {
+            padding: 15px 30px;
+            border-radius: 25px;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-size: 200% auto;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 160px;
+            background: linear-gradient(135deg, #6366f1 0%, #14b8a6 100%);
+            color: white;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        button:hover {
+            background-position: right center;
+        }
+
+        /* 新增的图片容器样式 */
+        .image-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        .image-item {
+            width: 48%;
+            margin-bottom: 20px;
+        }
+
+        /* 图片显示区域 */
+        img {
+            margin-top: 20px;
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 加载状态样式 */
+        button.loading {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s linear infinite;
+            margin-left: 8px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        button.loading .loading-spinner {
+            display: inline-block;
+        }
+
+        button.loading .button-text {
+            opacity: 0.8;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .title {
+                font-size: 36px;
+            }
+
+            .subtitle {
+                font-size: 18px;
+            }
+
+            input[type="file"],
+            select {
+                width: 100%;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            img {
+                max-width: 100%;
+                margin-bottom: 20px;
+            }
+
+            .input-section .button-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="title">图片压缩工具</h1>
+        <p class="subtitle">轻松压缩图片，节省空间（可自定义压缩比例）</p>
+
+        <div class="input-section">
+            <form id="uploadForm">
+                <input placeholder="请选择图片" type="file" id="image" name="image" accept="image/*" required>
+                <br><br>
+                <select id="rate" name="rate">
+                    <option value="99">压缩比率99</option>
+                    <option value="97">压缩比率97</option>
+                    <option value="95">压缩比率95</option>
+                    <option value="90">压缩比率90</option>
+                    <option selected value="80">压缩比率80</option>
+                    <option value="70">压缩比率70 </option>
+                    <option value="60">压缩比率60</option>
+                    <option value="50">压缩比率50</option>
+                    <option value="40">压缩比率40</option>
+                    <option value="30">压缩比率30</option>
+                    <option value="20">压缩比率20</option>
+                    <option value="10">压缩比率10</option>
+                    <option value="5">压缩比率5</option>
+                    <option value="3">压缩比率3</option>
+                    <option value="1">压缩比率1</option>
+                </select>
+                <div class="button-container">
+                    <button type="button" id="clearButton" disabled>清除已选图片</button>
+                    <button type="submit" id="uploadButton" disabled>
+                        <span class="button-text">上传并压缩</span>
+                        <span class="loading-spinner"></span>
+                    </button>
+                    <button type="button" id="downloadButton" disabled>下载压缩图</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="image-container">
+            <div class="image-item">
+                <h3 style="text-align: center;">原图 <span id="originalImageSize"></span></h3>
+                <img id="originalImage" src="" alt="原图将显示在这里" style="display:none;">
+            </div>
+            <div class="image-item">
+                <h3 style="text-align: center;">压缩后的图 <span id="compressedImageSize"></span></h3>
+                <img id="compressedImage" src="" alt="压缩图将显示在这里" style="display:none;">
+            </div>
+        </div>
+
+        <script>
+            const uploadButton = document.getElementById('uploadButton');
+            const clearButton = document.getElementById('clearButton');
+            const downloadButton = document.getElementById('downloadButton');
+            const imageInput = document.getElementById('image');
+            const originalImage = document.getElementById('originalImage');
+            const compressedImage = document.getElementById('compressedImage');
+            const originalImageSize = document.getElementById('originalImageSize');
+            const compressedImageSize = document.getElementById('compressedImageSize');
+
+            // 监听文件输入框的 change 事件
+            imageInput.addEventListener('change', function () {
+                if (this.files.length > 0) {
+                    clearButton.disabled = false;
+                    uploadButton.disabled = false;
+                } else {
+                    clearButton.disabled = true;
+                    uploadButton.disabled = true;
+                    downloadButton.disabled = true;
+                }
+            });
+
+            // 转换文件大小为合适的单位
+            function formatFileSize(size) {
+                if (size < 1024) {
+                    return size + ' B';
+                } else if (size < 1024 * 1024) {
+                    return (size / 1024).toFixed(2) + ' KB';
+                } else {
+                    return (size / (1024 * 1024)).toFixed(2) + ' MB';
+                }
+            }
+
+            document.getElementById('uploadForm').addEventListener('submit', function (event) {
+                event.preventDefault(); // 防止表单默认提交
+
+                uploadButton.classList.add('loading'); // 添加加载类
+                downloadButton.disabled = true;
+
+                const formData = new FormData(this);
+                fetch('/imgCompress/compress', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('网络响应不是 OK');
+                        }
+                        return response.blob(); // 获取压缩后的图片
+                    })
+                    .then(blob => {
+                        // 显示原图
+                        const fileInput = document.getElementById('image').files[0];
+                        originalImage.src = URL.createObjectURL(fileInput);
+                        originalImage.style.display = 'block';
+                        originalImageSize.textContent = `(${formatFileSize(fileInput.size)})`;
+
+                        // 显示压缩后的图
+                        compressedImage.src = URL.createObjectURL(blob);
+                        compressedImage.style.display = 'block';
+                        compressedImageSize.textContent = `(${formatFileSize(blob.size)})`;
+                        downloadButton.disabled = false;
+                    })
+                    .catch(error => {
+                        console.error('发生错误:', error);
+                    })
+                    .finally(() => {
+                        uploadButton.classList.remove('loading'); // 移除加载类
+                    });
+            });
+
+            clearButton.addEventListener('click', function () {
+                imageInput.value = '';
+                originalImage.style.display = 'none';
+                compressedImage.style.display = 'none';
+                originalImage.src = '';
+                compressedImage.src = '';
+                originalImageSize.textContent = '';
+                compressedImageSize.textContent = '';
+                clearButton.disabled = true;
+                uploadButton.disabled = true;
+                downloadButton.disabled = true;
+            });
+
+            downloadButton.addEventListener('click', function () {
+                const url = compressedImage.src;
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'compressed_image';
+                document.body.appendChild(a);
+                a.click();
+            });
+        </script>
+    </div>
+</body>
+
+</html>
